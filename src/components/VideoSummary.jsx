@@ -1,8 +1,12 @@
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Copy, File, FileText } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const VideoSummary = () => {
   const [activeTab, setActiveTab] = useState("summary");
+  const videoCardRef = useRef(null);
+  const summaryBoxRef = useRef(null);
 
   const keyPoints = [
     {
@@ -13,10 +17,36 @@ const VideoSummary = () => {
     { time: "07:15", text: "Real-world applications and examples" },
   ];
 
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: videoCardRef.current,
+        start: "top bottom-=100",
+        end: "bottom center",
+      },
+    });
+
+    timeline
+      .fromTo(
+        videoCardRef.current,
+        { x: -50, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.6 }
+      )
+      .fromTo(
+        summaryBoxRef.current,
+        { x: 50, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.6 },
+        "-=0.4"
+      );
+  }, []);
+
   return (
     <div className="container mx-auto mt-10 flex flex-col md:flex-row gap-6 p-4 justify-baseline items-start">
       {/* Left Video Card */}
       <div
+        ref={videoCardRef}
         className="flex-1 rounded-xl overflow-hidden shadow-md"
         style={{ maxWidth: "500px" }}
       >
@@ -38,7 +68,10 @@ const VideoSummary = () => {
       </div>
 
       {/* Right: Summary Box */}
-      <div className="flex-1 bg-white shadow-md rounded-xl p-6">
+      <div
+        ref={summaryBoxRef}
+        className="flex-1 bg-white shadow-md rounded-xl p-6"
+      >
         {/* Tabs */}
         <div className="flex gap-4 border-b border-gray-200 dark:border-gray-700 mb-4">
           <button

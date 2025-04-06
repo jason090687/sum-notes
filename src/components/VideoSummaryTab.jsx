@@ -1,8 +1,46 @@
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Copy, Download, Share2 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const VideoSummaryTab = () => {
   const [tab, setTab] = useState("summary");
+
+  const videoCardRef = useRef(null);
+  const tabsRef = useRef(null);
+  const contentRef = useRef(null);
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const timeline = gsap.timeline({
+      defaults: { duration: 0.6, ease: "power2.out" },
+      scrollTrigger: {
+        trigger: videoCardRef.current,
+        start: "top bottom-=100",
+        end: "bottom center",
+      },
+    });
+
+    timeline
+      .fromTo(
+        videoCardRef.current,
+        { x: -50, opacity: 0 },
+        { x: 0, opacity: 1 }
+      )
+      .fromTo(
+        tabsRef.current,
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1 },
+        "-=0.3"
+      )
+      .fromTo(
+        contentRef.current,
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1 },
+        "-=0.2"
+      );
+  }, []);
 
   const tabs = ["summary", "notes", "keypoints"];
 
@@ -28,7 +66,7 @@ const VideoSummaryTab = () => {
   return (
     <div className="container mx-auto p-7 flex flex-col md:flex-row gap-6 bg-[#F8FAFC]">
       {/* Left: Video Card */}
-      <div className="flex-1 bg-white rounded-xl shadow p-5">
+      <div ref={videoCardRef} className="flex-1 bg-white rounded-xl shadow p-5">
         <div className="aspect-video bg-gray-100 flex items-center justify-center rounded-lg">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -49,7 +87,7 @@ const VideoSummaryTab = () => {
       {/* Right: Tab Section */}
       <div className="flex-1 bg-white rounded-xl shadow p-4">
         {/* Tabs */}
-        <div className="flex gap-6 border-b pb-2 mb-4">
+        <div ref={tabsRef} className="flex gap-6 border-b pb-2 mb-4">
           {tabs.map((t) => (
             <button
               key={t}
@@ -66,7 +104,9 @@ const VideoSummaryTab = () => {
         </div>
 
         {/* Content */}
-        <div className="text-sm text-gray-700 min-h-[20px]">{getContent()}</div>
+        <div ref={contentRef} className="text-sm text-gray-700 min-h-[20px]">
+          {getContent()}
+        </div>
 
         {/* Actions */}
         <div className="mt-6 flex gap-4">

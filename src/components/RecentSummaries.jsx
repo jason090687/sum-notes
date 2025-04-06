@@ -1,4 +1,6 @@
-import React from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import React, { useEffect, useRef } from "react";
 
 const summaries = [
   {
@@ -22,15 +24,52 @@ const summaries = [
 ];
 
 const RecentSummaries = () => {
+  const cardsRef = useRef([]);
+  const headerRef = useRef(null);
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap.fromTo(
+      headerRef.current,
+      { y: 30, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.6,
+        scrollTrigger: {
+          trigger: headerRef.current,
+          start: "top bottom-=100",
+        },
+      }
+    );
+
+    gsap.fromTo(
+      cardsRef.current,
+      { y: 50, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.6,
+        stagger: 0.2,
+        scrollTrigger: {
+          trigger: cardsRef.current[0],
+          start: "top bottom-=50",
+        },
+      }
+    );
+  }, []);
+
   return (
     <div className="container mx-auto px-4 py-10">
-      <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+      <h2 ref={headerRef} className="text-2xl font-semibold text-gray-900 mb-6">
         Recent Summaries
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {summaries.map((summary) => (
+        {summaries.map((summary, index) => (
           <div
             key={summary.id}
+            ref={(el) => (cardsRef.current[index] = el)}
             className="bg-white rounded-xl shadow-sm overflow-hidden"
           >
             <div className="aspect-video bg-gray-100 flex items-center justify-center">
